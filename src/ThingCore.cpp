@@ -220,9 +220,6 @@ void ThingCore::_SetupHttp() {
     content += "<li>Core Version: ";
       content += TC_LIBVER;
       content += "</li>";
-    content += "<li>WebSockets&nbsp;&nbsp;: ";
-      content += (true ? "TRUE" : "FALSE");
-      content += "</li>";
     content += "</ul>";
     content += "<ul>";
     content += "<li>WiFi Network: " + WiFi.SSID() + "</li>";
@@ -231,15 +228,21 @@ void ThingCore::_SetupHttp() {
       content += "</li>";
     content += "<li>Device MAC&nbsp;&nbsp;: " + WiFi.macAddress() + "</li>";
     content += "</ul>";
+    content += "<ul>";
+    content += "<li>WebSockets&nbsp;&nbsp;: ";
+      content += (true ? "TRUE" : "FALSE");
+      content += "</li>";
+    content += "</ul>";
+    content += "<ul>";
+    content += "<li>PubSub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ";
+      content += (_PubSubConfigured() ? "TRUE" : "FALSE");
+      content += "</li>";
     if (_PubSubConfigured()) {
-      content += "<h2>PubSub</h2>";
-      content += "<ul>";
-      content += "<li>Connected&nbsp;: ";
+      content += "<li>Connected&nbsp;&nbsp;&nbsp;: ";
         content += (_mqttClient.connected() ? "TRUE" : "FALSE");
         content += "</li>";
       if (_pubSubListenTopic.length() > 0)
-        content += "<li>Subscribed: " + _pubSubListenTopic + "</li>";
-      content += "</ul>";
+        content += "<li>Subscribed&nbsp;&nbsp;: " + _pubSubListenTopic + "</li>";
     }
     content += "</ul>";
     if (this->cb_webstatusrender) {
