@@ -10,27 +10,21 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-#define TC_LIBVER   "1.2.20170205"
+#define TC_LIBVER   "2.0.20170211"
 #define TC_PINLED   LED_BUILTIN
 #define TC_PINRESET D5
 #define TC_LEDON    LOW
 #define TC_LEDOFF   HIGH
+#define TC_CALLBACK_GETAPPSTATUS    void (*cb_getappstatus)(JsonObject&)
 #define TC_CALLBACK_PUBSUBMESSAGE   void (*cb_pubsubmessage)(String, const char*)
 #define TC_CALLBACK_PUBSUBCONNECT   void (*cb_pubsubconnect)()
 #define TC_CALLBACK_WEBSOCKMESSAGE  void (*cb_websockmessage)(uint8_t, const char*)
 #define TC_CALLBACK_WEBSOCKCONNECT  void (*cb_websockconnect)(uint8_t)
-#define TC_CALLBACK_WEBSTATUSRENDER String (*cb_webstatusrender)()
 
 #define TC_PORTHTTP   8023
 #define TC_PORTWS     9023
 
-#define TC_DEFAULT_UPDATEURI   "/update"
-#define TC_DEFAULT_WEBUSER     "webuser"
-#define TC_DEFAULT_WEBPASS     "i love passwords."
-#define TC_DEFAULT_MQTTSERVER  ""
-#define TC_DEFAULT_MQTTPORT    1883
-#define TC_DEFAULT_MQTTUSER    ""
-#define TC_DEFAULT_MQTTPASS    ""
+#define DEFAULT_CONFIG "{\"web_user\":\"webuser\",\"web_pass\":\"i love passwords.\" }"
 
 using namespace std;
 
@@ -46,57 +40,60 @@ private:
   String _appName;
   String _appVersion;
   String _pubSubListenTopic;
+  String _config;
+  String _defaultDeviceName;
+  bool _pubSubConfigured;
   int _ledBlinks = 0;
   int _ledLastState = TC_LEDON;
   unsigned long _psLastConnect = 0;
   unsigned long _ledLastNow = 0;
 
-  String conf_devicename;
-  String conf_webupdatepath;
-  String conf_webuser;
-  String conf_webpass;
-  String conf_mqttserver;
-  int    conf_mqttport;
-  String conf_mqttuser;
-  String conf_mqttpass;
-
+  TC_CALLBACK_GETAPPSTATUS;
   TC_CALLBACK_PUBSUBMESSAGE;
   TC_CALLBACK_PUBSUBCONNECT;
   TC_CALLBACK_WEBSOCKMESSAGE;
   TC_CALLBACK_WEBSOCKCONNECT;
-  TC_CALLBACK_WEBSTATUSRENDER;
 
-  void _LoadConfig();
-  bool _SaveConfig();
+  void _loadSettings();
+  String _getSetting(String key);
+  const char* _getSettingChar(String key);
+  int _getSettingInt(String key);
+  bool _haveSetting(String key);
+  void _setSetting(String key, String value);
+  void _setSetting(String key, int value);
+  bool _saveSettings();
 
-  void _SetupWifi();
-  void _SetupDebug();
-  void _SetupPubSub();
-  void _SetupHttp();
-  void _SetupWebSockets();
+  String _getAppStatus();
+  void _loopStatusLed();
 
-  void _LoopPubSub();
-  void _LoopStatusLed();
+  void _setupWifi();
 
-  bool _PubSubConfigured();
-  void _DoSubscribe();
+  void _setupPubSub();
+  void _loopPubSub();
+  void _doSubscribe();
+
+  void _setupHttp();
+  void _loopHttp();
+
+  void _setupWebSockets();
+  void _loopWebSockets();
 
 public:
   ThingCore(String app_name, String app_verson);
-  void Start();
-  void Loop();
+  void start();
+  void loop();
 
   String getDeviceName();
-  void BlinkStatusLed(int count);
+  void blinkStatusLed(int count);
 
-  void RegisterPubSubMessage(String topic, TC_CALLBACK_PUBSUBMESSAGE);
-  void RegisterPubSubConnect(TC_CALLBACK_PUBSUBCONNECT);
-  bool PubSubPublish(String topic, const char* payload, bool retained);
+  void setAppStatusHandler(TC_CALLBACK_GETAPPSTATUS);
 
-  void RegisterWebSocketsMessage(TC_CALLBACK_WEBSOCKMESSAGE);
-  void RegisterWebSocketsConnect(TC_CALLBACK_WEBSOCKCONNECT);
-  void WebSocketsSend(const char* payload);
-  void WebSocketsSend(uint8_t num, const char* payload);
+  void setPubSubMessageHandler(String topic, TC_CALLBACK_PUBSUBMESSAGE);
+  void setPubSubConnectHandler(TC_CALLBACK_PUBSUBCONNECT);
+  bool pubSubPublish(String topic, const char* payload, bool retained);
 
-  void RegisterWebStatusRender(TC_CALLBACK_WEBSTATUSRENDER);
+  void setWebSocketsMessageHandler(TC_CALLBACK_WEBSOCKMESSAGE);
+  void setWebSocketsConnectHandler(TC_CALLBACK_WEBSOCKCONNECT);
+  void webSocketsSend(const char* payload);
+  void webSocketsSend(uint8_t num, const char* payload);
 };
