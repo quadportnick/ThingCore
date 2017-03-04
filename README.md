@@ -1,3 +1,5 @@
+>>> I won't be doing much here anymore, I've discovered the ESPEasy project and like what I see there
+
 # ThingCore
 This is my common middleware library for my IoT projects around the house since 80%+ of each device's codebase is the same fundamental stuff. It's currently based on ESP8266. This is a work in progress as I learn and improve.
 
