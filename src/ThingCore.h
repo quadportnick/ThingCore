@@ -10,7 +10,7 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-#define TC_LIBVER   "2.0.20170211"
+#define TC_LIBVER   "2.0.20170226"
 #define TC_PINLED   LED_BUILTIN
 #define TC_PINRESET D5
 #define TC_LEDON    LOW
